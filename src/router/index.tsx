@@ -1,9 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import LoginScreen from "../components/loginScreen";
 import MenuScreen from "../components/menuItems";
 import Home from "../screens/Home";
@@ -58,27 +56,28 @@ const Router = () => {
     return () => unsubscribe();
   }, []);
 
+  if (isLoggedIn === null) {
+    // Render a loading screen or null while determining login state
+    return null;
+  }
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName={isLoggedIn ? "Home" : "Onboarding"}
-          screenOptions={{ headerShown: false }}
-        >
-          {!isLoggedIn ? (
-            <>
-              <Stack.Screen name="Login" component={LoginScreen} />
-              <Stack.Screen name="Onboarding" component={Onboarding} />
-            </>
-          ) : (
-            <>
-              <Stack.Screen name="Home" component={TabRoutes} />
-              <Stack.Screen name="Profile" component={Profile} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </GestureHandlerRootView>
+    <Stack.Navigator
+      initialRouteName={isLoggedIn ? "Home" : "Onboarding"}
+      screenOptions={{ headerShown: false }}
+    >
+      {!isLoggedIn ? (
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Onboarding" component={Onboarding} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="Home" component={TabRoutes} />
+          <Stack.Screen name="Profile" component={Profile} />
+        </>
+      )}
+    </Stack.Navigator>
   );
 };
 

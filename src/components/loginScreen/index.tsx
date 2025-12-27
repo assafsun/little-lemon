@@ -31,7 +31,7 @@ const LoginScreen = () => {
     }
 
     Alert.alert("Success", "You are now logged in.");
-    navigation.navigate("Welcome" as never);
+    navigation.navigate("Home" as never);
   };
 
   return (

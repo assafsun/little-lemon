@@ -1,5 +1,5 @@
 export const store = {
-  getStore: async (key: string) => {
+  getStore: async (key: string): Promise<UserInfo | null> => {
     // Mock implementation for getting data from the store
     console.log(`Getting data for key: ${key}`);
     return null;
