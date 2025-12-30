@@ -9,8 +9,6 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="dark" translucent animated />
       <SQLiteProvider databaseName="littleLemon.db" onInit={initializeDatabase}>
-        {/* <LittleLemonHeader /> */}
-
         <Router />
       </SQLiteProvider>
     </View>
@@ -21,6 +19,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: "#333333",
+    backgroundColor: "#fff",
   },
 });

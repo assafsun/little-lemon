@@ -1,120 +1,62 @@
-import { Feather } from "@expo/vector-icons";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { Image } from "expo-image";
-import React, { useCallback, useMemo } from "react";
-import {
-    FlatList,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { MenuItem as DatabaseMenuItem, useMenuItemsDatabase } from "../../database/useMenuItemsDatabase";
+import Menu from "@/src/components/Menu";
+import { Image, StyleSheet, Text, View } from "react-native";
 
-type MenuItemDetailsParams = {
-  item: DatabaseMenuItem;
-};
-
-const Home = () => {
-  const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
-  const { menuItems, fetchMenuItems } = useMenuItemsDatabase();
-  const [searchQuery, setSearchQuery] = React.useState("");
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchMenuItems();
-    }, [fetchMenuItems])
-  );
-
-  const filteredMenuItems = useMemo(() => {
-    return menuItems.filter((item: DatabaseMenuItem) =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+export default function Home() {
+    return (
+        <View style={styles.container}>
+            <View style={styles.welcome}>
+                <Text style={styles.title}>Little Lemon</Text>
+                <View style={styles.main}>
+                    <View style={styles.content}>
+                        <Text style={styles.subtitle}>Chicago</Text>
+                        <Text style={styles.text}>
+                            We are a family owned Mediterranean restaurant, focused on traditional
+                            recipes served with a modern twist.
+                        </Text>
+                    </View>
+                    <Image
+                        style={styles.image}
+                        source={require("../../img/hero-img.png")}
+                        accessible={true}
+                        accessibilityLabel={"Little Lemon Food"}
+                    />
+                </View>
+            </View>
+            <Menu />
+        </View>
     );
-  }, [menuItems, searchQuery]);
-
-  const renderItem = ({ item }: { item: DatabaseMenuItem }) => (
-    <TouchableOpacity
-      style={styles.menuItem}
-      onPress={() =>
-        navigation.navigate("MenuItemDetails" as never, { item } as MenuItemDetailsParams as never)
-      }
-    >
-      <Image source={{ uri: item.image }} style={styles.menuItemImage} />
-      <Text style={styles.menuItemName}>{item.name}</Text>
-    </TouchableOpacity>
-  );
-
-  return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Little Lemon</Text>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <Feather name="search" size={24} color="black" />
-      </View>
-      <FlatList
-        data={filteredMenuItems}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id?.toString() || "unknown"}
-        contentContainerStyle={styles.menuList}
-      />
-    </View>
-  );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: "#f8f8f8",
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    marginRight: 8,
-  },
-  menuList: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  menuItemImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    marginRight: 16,
-  },
-  menuItemName: {
-    fontSize: 18,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: "#495E57",
+    },
+    welcome: {
+        padding: 16,
+    },
+    title: {
+        color: "#f4ce14",
+        fontSize: 54,
+    },
+    subtitle: {
+        color: "#fff",
+        fontSize: 30,
+    },
+    text: {
+        color: "#fff",
+        fontSize: 14,
+    },
+    main: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    content: {
+        flex: 1,
+    },
+    image: {
+        width: 100,
+        height: 100,
+        borderRadius: 12,
+    },
 });
-
-export default Home;

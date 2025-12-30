@@ -1,80 +1,91 @@
-import React, { useMemo, useState } from "react";
+import type { User } from "@/src/types";
+
+import { useContext, useState } from "react";
 import {
-    Alert,
-    Image,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
-import { store } from "../../store";
 
-const Onboarding = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+import AuthContext from "@/src/context/AuthContext";
 
-  const isNextEnabled = useMemo(() => name.length > 0 && email.length > 0, [name, email]);
+import { validateEmail, validateName } from "@/src/utils";
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+export default function Onboarding() {
+    const [firstName, setFirstName] = useState("");
+    const [email, setEmail] = useState("");
 
-  const handleNext = async () => {
-    if (validateEmail(email)) {
-      await store.setStore("userInfo", { name, email, isLoggedIn: true });
-      console.log("✅ User info saved to store");
-    } else {
-      Alert.alert("Invalid Email", "Please enter a valid email address.");
-    }
-  };
+    const isValidName = validateName(firstName);
+    const isValidEmail = validateEmail(email);
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          resizeMode="contain"
-          style={{ width: 250, height: 150 }}
-          source={require("../../img/littleLemonLogo.png")}
-        />
-      </View>
-      <View style={styles.body}>
-        <Text style={styles.title}>Let us get to know you</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Name"
-            placeholderTextColor="black"
-            value={name}
-            onChangeText={setName}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor="black"
-            value={email}
-            onChangeText={setEmail}
-          />
-        </View>
-      </View>
-      <View style={styles.footer}>
-        <TouchableOpacity
-          onPress={handleNext}
-          style={[styles.button, !isNextEnabled && styles.disabledButton]}
-          activeOpacity={0.7}
-          disabled={!isNextEnabled}
+    const { onboard } = useContext(AuthContext);
+
+    const handleNext = async () => {
+        const data: User = { firstName, email, lastName: "", phone: "", photo: "" };
+        onboard(data);
+    };
+
+    return (
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
+            <View style={styles.header}>
+                <Image
+                    resizeMode="contain"
+                    style={styles.logo}
+                    source={require("../../img/littleLemonLogo.png")}
+                />
+            </View>
+            <View style={styles.main}>
+                <View style={styles.textBlock}>
+                    <Text style={styles.title}>Let us get to know you</Text>
+                </View>
+                <View style={styles.form}>
+                    <Text style={styles.label}>First Name</Text>
+                    <TextInput
+                        value={firstName}
+                        onChangeText={setFirstName}
+                        placeholder="John"
+                        placeholderTextColor="#999"
+                        style={styles.input}
+                    />
+                    <Text style={styles.label}>Email</Text>
+                    <TextInput
+                        value={email}
+                        onChangeText={setEmail}
+                        placeholder="example@example.com"
+                        placeholderTextColor="#999"
+                        keyboardType="email-address"
+                        style={styles.input}
+                    />
+                </View>
+            </View>
+            <View style={styles.bottom}>
+                <Pressable
+                    style={[
+                        styles.button,
+                        !isValidName || !isValidEmail ? styles.buttonDisabled : "",
+                    ]}
+                    onPress={handleNext}
+                    disabled={!isValidName || !isValidEmail}
+                >
+                    <Text style={styles.buttonText}>Next</Text>
+                </Pressable>
+            </View>
+        </KeyboardAvoidingView>
+    );
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
   },
   header: {
     width: "100%",
@@ -82,54 +93,64 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "lightgray",
+    backgroundColor: "#dee3e9",
   },
   logo: {
     width: 250,
     height: 150,
   },
-  body: {
+  main: {
     flex: 1,
-    justifyContent: "space-around",
     alignItems: "center",
+    padding: 20,
+  },
+  textBlock: {
+    flex: 1,
+    justifyContent: "center",
   },
   title: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
+    color: "#333",
   },
-  inputContainer: {
-    width: "100%",
-    alignItems: "center",
+  form: {
+    gap: 16,
+    paddingVertical: 32,
+    alignSelf: "stretch",
+  },
+  label: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "500",
   },
   input: {
-    width: "80%",
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  footer: {
-    height: 100,
-    backgroundColor: "lightgray",
-    justifyContent: "center",
-    alignItems: "center",
+    fontSize: 16,
+    padding: 12,
+    backgroundColor: "#EDEFEE",
+    borderRadius: 8,
+    color: "#333",
   },
   button: {
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
+    alignSelf: "flex-end",
+    backgroundColor: "#495E57",
+    minWidth: 100,
+    padding: 12,
+    borderRadius: 8,
   },
-  disabledButton: {
-    opacity: 0.7,
+  buttonDisabled: {
+    opacity: 0.5,
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: "bold",
+    color: "#ffffff",
+    textAlign: "center",
+    fontWeight: "600",
+  },
+  bottom: {
+    padding: 20,
+    paddingBottom: 40,
+    backgroundColor: "#f1f4f7",
   },
 });
 
-export default Onboarding;
+export { Onboarding };
